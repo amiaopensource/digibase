@@ -9,7 +9,7 @@ In order to use digibase you should create a user of the MySQL server that is no
 Create a database that you intend to use and save the name of this database. You can do this thorugh a GUI or through the command line. 
 
 # How digibase works
-When it starts up for the first time, digibase will prompt you for information like the host name where your SQL server is running, your username, your password, and the name of your database. This information will be saved to a congiuration file.
+When it starts up for the first time, digibase will prompt you for information like the host name where your SQL server is running, your username, your password, and the name of your database. This information will be saved to a configuration file.
 
 # Status of digibase 
 Digibase is currently being tested and is not production-ready. We'll create a public release when the scripts are ready for prime time. 
