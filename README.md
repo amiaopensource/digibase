@@ -6,7 +6,7 @@ In order to use digibase, you will need to install and setup a MySQL server. Thi
 
 In order to use digibase you should create a user of the MySQL server that is not "root" can sign in from a location other than the local machine.
 
-Create a database that you intend to use and save the name of this database. You can do this thorugh a GUI or through the command line. 
+Create a database that you intend to use and save the name of this database.
 
 # How digibase works
 When it starts up for the first time, digibase will prompt you for information like the host name where your SQL server is running, your username, your password, and the name of your database. This information will be saved to a configuration file.
