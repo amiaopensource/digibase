@@ -102,10 +102,14 @@ fi
 
 # write to configuration file
         echo "#$(basename "${0}") config file" > "${config_file}"
-        echo "${host_name}" >> "${config_file}"
-        echo "${user_name}" >> "${config_file}"
-        echo "${password}" >> "${config_file}"
-        echo "${database}" >> "${config_file}"
+        echo "host_name=\"${host_name}\"" >> "${config_file}"
+        echo  >> "${config_file}"
+        echo "user_name=\"${user_name}\"" >> "${config_file}"
+        echo  >> "${config_file}"
+        echo "password=\"${password}\"" >> "${config_file}"
+        echo  >> "${config_file}"
+        echo "database=\"${database}\"" >> "${config_file}"
+        echo  >> "${config_file}"
         
 # give user a summary of what they've chosen
 report -d "Summary: user name: ${user_name}, password: ${password}, database: ${database}"
@@ -120,16 +124,13 @@ _connect_db(){
 #Check to see if MySQL server connection is working
 _test_sql(){
 db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} 2>&1)
-if [[ "${db_errors}" = *"1045"* ]] ; then
+if [[ "${db_errors}" = *"1045"* || *"2005"* ]] ; then
 echo "Error connecting with MySQL server. Sorry."
-set db_errors=1
+exit
 else
 echo "Connection to MySQL server seems to be ok."
 fi
 }
-
-#run the SQL test
-#_test_sql
 
 #Check to see if tables have already been created, if not, create them
 _create_tables(){
@@ -142,14 +143,16 @@ CREATE TABLE ${table_name2} (job_id MEDIUMINT(8) NOT NULL, timestamp DATETIME, e
 CREATE TABLE ${table_name3} (digitization_status VARCHAR(50) NOT NULL, item_id VARCHAR(128) NOT NULL, qc_status VARCHAR(50) NULL, object_type VARCHAR(50) NOT NULL, file_path VARCHAR(256) NULL, media_id VARCHAR(20) NULL, title VARCHAR(256) NULL, series VARCHAR(256), PRIMARY KEY (item_id));
 CREATE TABLE ${table_name4} (item_id VARCHAR(128) NOT NULL, relationship_type VARCHAR(128) NOT NULL, PRIMARY KEY (item_id));"
     echo "Table set up complete!"
-elif [[ "${db_errors}" -ne "1" ]] ; then
+    else 
     echo "Tables are already set up! B-)"
-else 
-    echo "You've got database problems. :'("
 fi 
 }
 
+#run the SQL test
+#_test_sql
+#create the tables
 _create_tables
+
 #create a new record when the user starts the digitization (pulls unique ID from vrecord, recording directory, and technician name)
 
 #reads output of vrecord, looks for/parses error messages
