@@ -35,10 +35,28 @@ report(){
         echo $echoopt "${color}${startmessage[@]}${message}${NC}"
 }
 
-# define how to connect to the database
-_connect_db(){
-    mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} --reconnect
+usage(){
+    echo
+    echo "$(basename ${0}) ${version}"
+    echo "$(basename "${0}") Uses MySQL to create a database for tape digitizations."
+    echo "Usage: $(basename $0) [ -h ]"
+    echo "  -h ( display this help menu )"
+    echo "  -r ( enable run mode [default] )"
+    echo "  -x ( reset the configuration, this will clear the default configuration file at ${config_file} and create a new one)"
+    exit
 }
+
+# command-line options to set mediaid and original variables
+OPTIND=1
+while getopts "herpx" opt ; do
+    case "${opt}" in
+        h) usage ;;
+        r) runtype="run";;
+        x) runtype="reset" ;;
+        *) report -w "bad option -$OPTARG" ; usage ;;
+        :) report -w "Option -$OPTARG requires an argument" ; exit 1 ;;
+    esac
+done
 
 # read configuration file or create one
 if [[ -f "${config_file}" ]] ; then
@@ -46,7 +64,7 @@ if [[ -f "${config_file}" ]] ; then
 else
     echo -e "No configuration file. Restarting."
     touch "${config_file}"
-    $(basename "${0}") -e
+    $(basename "${0}") -x
 fi
 
 # option for resetting config file
@@ -90,9 +108,14 @@ fi
         echo "${database}" >> "${config_file}"
         
 # give user a summary of what they've chosen
-        report -d "Summary: user name: ${user_name}, password: ${password}, database: ${database}"
+report -d "Summary: user name: ${user_name}, password: ${password}, database: ${database}"
 report -q "Press enter if settings look correct"
 read
+
+# define how to connect to the database
+_connect_db(){
+    mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} --reconnect
+}
 
 #Check to see if MySQL server connection is working
 _test_sql(){
@@ -106,7 +129,7 @@ fi
 }
 
 #run the SQL test
-_test_sql
+#_test_sql
 
 #Check to see if tables have already been created, if not, create them
 _create_tables(){
