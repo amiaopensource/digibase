@@ -1,1 +1,13 @@
+#!/bin/bash
 
+#Present user with options
+#1. Search by Item ID
+#2. Search by Media ID
+#3. Search by title?
+#4. Search by series?
+
+#Query database for info
+
+
+
+#Present info
