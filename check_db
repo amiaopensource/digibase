@@ -1,24 +1,26 @@
 #!/bin/bash
 
+
+#date=$(_get_iso8601) |
 #Present user with options
 #1. Search by Item ID
-#2. Search by Media ID
-#3. Search all done by today
-#4. Search by title?
-#5. Search by series?
-
-echo "How do you want to search? Type 1 to search by Item ID, type 2 to search by Media ID, type 3 to see all digitizations done by today. Type Q if you want to stop searching. "
+#2. Search all done by today
+#3. Search by title?
+#4. Search by series?
+#5. Search by Media ID
+while ${search_option} -nq "q" || "Q"; do
+printf "How do you want to search?\nType 1 to search by Item ID,\nType 2 to search by Media ID\Type 3 to see all digitizations done by today.\nType Q if you want to stop searching.\nThen press [enter]. "
 read search_option
 
 
 #Query database for info
-if [[ {$search_option} = "1" ]] ; then
+if [[ "${search_option}" = "1" ]] ; then
 	echo "Enter the Item ID number and press enter"
 	read item_id_choice
 	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "USE ${database}; SELECT * from ${table_name3} WHERE item_id=${item_id_choice};"
-elif [[ {$search_option} = "2" ]] ; then
-
-elif [[ {$search_option} = "3" ]] ; then
-elif [[ {$search_option} = "Q" || {$search_option} = "q" ]] ; then
-exit 1
+elif [[ "${search_option}" = "2" ]] ; then
+	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "USE ${database}; SELECT * from ${table_name1} WHERE timestamp=${date};"
+elif [[ "${search_option}" = "Q" || "${search_option}" = "q" ]] ; then
+	exit 1
+else echo "Not a valid input"
 fi

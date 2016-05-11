@@ -1,4 +1,3 @@
-#!/bin/bash
 
 # setup config file and table names
 config_file="$HOME/.$(basename "${0}").conf"
@@ -112,13 +111,13 @@ fi
         echo  >> "${config_file}"
         
 # give user a summary of what they've chosen
-report -d "Summary: user name: ${user_name}, password: ${password}, database: ${database}"
+report -d "Summary: host: ${host_name}, user name: ${user_name}, password: ${password}, database: ${database}"
 report -q "Press enter if settings look correct"
 read
 
 # define how to connect to the database
 _connect_db(){
-    mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} --reconnect
+    mysql -h ${host_name} -u ${user_name} -p${password} -D ${database}
 }
 
 #Check to see if MySQL server connection is working
@@ -134,16 +133,18 @@ fi
 
 #Check to see if tables have already been created, if not, create them
 _create_tables(){
-table_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "
+db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "
 DESCRIBE ${table_name1};" 2>&1)
-if [[ "${table_errors}" = *"1146"* ]] ; then
+if [[ "${db_errors}" = *"1146"* ]] ; then
 echo "Tables have not been set up" 
 mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "CREATE TABLE ${table_name1} (action_type varchar(30) NOT NULL, job_id MEDIUMINT(8) NOT NULL AUTO_INCREMENT, technician varchar(128) NOT NULL,  computer_name varchar(128) NOT NULL, time_started DATETIME NOT NULL, time_ended DATETIME NOT NULL, PRIMARY KEY (job_id));
 CREATE TABLE ${table_name2} (job_id MEDIUMINT(8) NOT NULL, timestamp DATETIME, error_text VARCHAR(8000), PRIMARY KEY (job_id));
 CREATE TABLE ${table_name3} (digitization_status VARCHAR(50) NOT NULL, item_id VARCHAR(128) NOT NULL, qc_status VARCHAR(50) NULL, object_type VARCHAR(50) NOT NULL, file_path VARCHAR(256) NULL, media_id VARCHAR(20) NULL, title VARCHAR(256) NULL, series VARCHAR(256), PRIMARY KEY (item_id));
 CREATE TABLE ${table_name4} (item_id VARCHAR(128) NOT NULL, relationship_type VARCHAR(128) NOT NULL, PRIMARY KEY (item_id));"
     echo "Table set up complete!"
-    else 
+elif [[ "${db_errors}" = *"1045"* || "${db_errors}" = *"2005"* ]] ; then
+    echo "You've got database connection problems. Sorry."
+else 
     echo "Tables are already set up! B-)"
 fi 
 }
