@@ -1,38 +1,8 @@
+#!/bin/bash
 
-# setup config file and table names
-config_file="$HOME/.$(basename "${0}").conf"
-table_name1="actions"
-table_name2="errors"
-table_name3="objects"
-table_name4="relationships"
-runtype="run"
-
-# report function might be useful to be consistent with other apps
-report(){
-        local RED="$(tput setaf 1)"   # Red      - For Warnings
-        local GREEN="$(tput setaf 2)" # Green    - For Declarations
-        local BLUE="$(tput setaf 4)"  # Blue     - For Questions
-        local NC="$(tput sgr0)"       # No Color
-        local color=""
-        local startmessage=""
-        local endmessage=""
-        local echoopt=""
-        local log_message=""
-        OPTIND=1
-        while getopts ":qdwstn" opt; do
-            case "${opt}" in
-                q) color="${BLUE}" ;; # question mode, use color blue
-                d) color="${GREEN}" ;; # declaration mode, use color green
-                w) color="${RED}" ; log_message="Y";; # warning mode, use color red
-                s) startmessage+=([$(basename "${0}")] ) ;; # prepend scriptname to the message
-                t) startmessage+=($(_get_iso8601) '- ' ) ;; # prepend timestamp to the message
-                n) echoopt="-n" ;; # to avoid line breaks after echo
-            esac
-        done
-        shift $(( ${OPTIND} - 1 ))
-        message="${1}"
-        echo $echoopt "${color}${startmessage[@]}${message}${NC}"
-}
+#get digibase_functions
+SCRIPTDIR=$(dirname "${0}")
+. "${SCRIPTDIR}/digibase_functions" || { echo "Missing '${SCRIPTDIR}/digibase_functions'. Exiting." ; exit 1 ;};
 
 usage(){
     echo
@@ -41,7 +11,7 @@ usage(){
     echo "Usage: $(basename $0) [ -h ]"
     echo "  -h ( display this help menu )"
     echo "  -r ( enable run mode [default] )"
-    echo "  -x ( reset the configuration, this will clear the default configuration file at ${config_file} and create a new one)"
+    echo "  -x ( reset the configuration, this will clear the default configuration file at ${digibase_config_file} and create a new one)"
     exit
 }
 
@@ -58,22 +28,21 @@ while getopts "herpx" opt ; do
 done
 
 # read configuration file or create one
-if [[ -f "${config_file}" ]] ; then
-    . "${config_file}"
+if [[ -f "${digibase_config_file}" ]] ; then
+    . "${digibase_config_file}"
 else
     echo -e "No configuration file. Restarting."
-    touch "${config_file}"
+    touch "${digibase_config_file}"
     $(basename "${0}") -x
 fi
 
 # option for resetting config file
 if [[ "${runtype}" = "reset" ]] ; then
- report -q -n "Reseting the configuration will clear ${config_file}. Please enter [Y] to confirm: "
+ report -q -n "Reseting the configuration will clear ${digibase_config_file}. Please enter [Y] to confirm: "
   read reset_response
    if [[ "${reset_response}" = "Y" || "${reset_response}" = "y" ]] ; then
-    report -d "Clearing ${config_file}."
-     echo -n "" > "${config_file}"
-      runtype="edit"
+    report -d "Clearing ${digibase_config_file}."
+     echo -n "" > "${digibase_config_file}"
     else
        report -d "Reset aborted. Exiting."
     exit 0
@@ -100,54 +69,20 @@ if [ -z "${database}" ] ; then
 fi
 
 # write to configuration file
-        echo "#$(basename "${0}") config file" > "${config_file}"
-        echo "host_name=\"${host_name}\"" >> "${config_file}"
-        echo  >> "${config_file}"
-        echo "user_name=\"${user_name}\"" >> "${config_file}"
-        echo  >> "${config_file}"
-        echo "password=\"${password}\"" >> "${config_file}"
-        echo  >> "${config_file}"
-        echo "database=\"${database}\"" >> "${config_file}"
-        echo  >> "${config_file}"
+        echo "#digibase config file" > "${digibase_config_file}"
+        echo "host_name=\"${host_name}\"" >> "${digibase_config_file}"
+        echo  >> "${digibase_config_file}"
+        echo "user_name=\"${user_name}\"" >> "${digibase_config_file}"
+        echo  >> "${digibase_config_file}"
+        echo "password=\"${password}\"" >> "${digibase_config_file}"
+        echo  >> "${digibase_config_file}"
+        echo "database=\"${database}\"" >> "${digibase_config_file}"
+        echo  >> "${digibase_config_file}"
         
 # give user a summary of what they've chosen
 report -d "Summary: host: ${host_name}, user name: ${user_name}, password: ${password}, database: ${database}"
 report -q "Press enter if settings look correct"
 read
-
-# define how to connect to the database
-_connect_db(){
-    mysql -h ${host_name} -u ${user_name} -p${password} -D ${database}
-}
-
-#Check to see if MySQL server connection is working
-_test_sql(){
-db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} 2>&1)
-if [[ "${db_errors}" = *"1045"* || *"2005"* ]] ; then
-echo "Error connecting with MySQL server. Sorry."
-exit
-else
-echo "Connection to MySQL server seems to be ok."
-fi
-}
-
-#Check to see if tables have already been created, if not, create them
-_create_tables(){
-db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "
-DESCRIBE ${table_name1};" 2>&1)
-if [[ "${db_errors}" = *"1146"* ]] ; then
-echo "Tables have not been set up" 
-mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "CREATE TABLE ${table_name1} (action_type varchar(30) NOT NULL, job_id MEDIUMINT(8) NOT NULL AUTO_INCREMENT, technician varchar(128) NOT NULL,  computer_name varchar(128) NOT NULL, time_started DATETIME NOT NULL, time_ended DATETIME NOT NULL, PRIMARY KEY (job_id));
-CREATE TABLE ${table_name2} (job_id MEDIUMINT(8) NOT NULL, timestamp DATETIME, error_text VARCHAR(8000), PRIMARY KEY (job_id));
-CREATE TABLE ${table_name3} (digitization_status VARCHAR(50) NOT NULL, item_id VARCHAR(128) NOT NULL, qc_status VARCHAR(50) NULL, object_type VARCHAR(50) NOT NULL, file_path VARCHAR(256) NULL, media_id VARCHAR(20) NULL, title VARCHAR(256) NULL, series VARCHAR(256), PRIMARY KEY (item_id));
-CREATE TABLE ${table_name4} (item_id VARCHAR(128) NOT NULL, relationship_type VARCHAR(128) NOT NULL, PRIMARY KEY (item_id));"
-    echo "Table set up complete!"
-elif [[ "${db_errors}" = *"1045"* || "${db_errors}" = *"2005"* ]] ; then
-    echo "You've got database connection problems. Sorry."
-else 
-    echo "Tables are already set up! B-)"
-fi 
-}
 
 #run the SQL test
 #_test_sql
