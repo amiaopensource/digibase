@@ -20,9 +20,9 @@ If you want a user who can connect from any host (for testing purposes only, thi
 
 Finally, you will need to give the new user privileges to modify the database you are using. Run the following query: `GRANT ALL PRIVILEGES ON name_of_database.* to username@host_address;`. Now run `FLUSH PRIVILEGES;` again. 
 
-To check to make sure the new user has been given the permissions on the database run `SHOW GRANTS FOR 'username'@'host_address';`.
+To check to make sure the new user has been given the permissions on the database run `SHOW GRANTS FOR 'username'@'host_address';`. 
 
-Your initial setup of digibase should now be complete!
+Now for the real test. Go to your remote computer and try to login as your new user by running `mysql -h [host address of MySQL server] -u [username] -p[password]`. Now run this query: `USE name_of_database;`. If you see the message `Database changed`, you're good to go. Your initial setup of digibase should now be complete!
 
 #Troubleshooting Installation
 Check your IPs and ports. You can check to see if the computer running the MySQL server is connected by pinging. You can also check to see if the server is listening on port 3306, which is used for MySQL. Type `telnet [host address] 3306`. If the connection works you should see some garbled nonsense like this: 
@@ -36,6 +36,8 @@ Now you now the server is listening on port 3306. Otherwise you may get a `conne
 
 # How digibase works
 When it starts up for the first time, digibase will prompt you for information like the host name where your SQL server is running, your username, your password, and the name of your database. This information will be saved to a configuration file (digibase.conf) in your home folder. 
+
+Digibase mostly works with vrecord. You will need to say yes to "Digibase integration" within vrecord. 
 
 # Status of digibase 
 Digibase is currently being tested and is not production-ready. We'll create a public release when the scripts are ready for prime time. 
