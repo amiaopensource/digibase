@@ -22,9 +22,17 @@ read search_option
 if [[ "${search_option}" = "1" ]] ; then
 	echo "Enter the Item ID number and press enter"
 	read item_id_choice
-	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "USE ${database}; SELECT * from ${table_name3} WHERE item_id=${item_id_choice};"
+	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name3} WHERE item_id=${item_id_choice};"
+		#read seach_result
+	#if [[ ${search_result} = "" ]] ; then 
+		#echo "Sorry, no records matach that search"
+	#fi
+elif [[ "${search_option}" = "3" ]] ; then
+	echo "Enter the date as DD-MM-YYYY and press enter"
+	read date_choice
+	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name1} WHERE time_started=${date_choice};"
 elif [[ "${search_option}" = "2" ]] ; then
-	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "USE ${database}; SELECT * from ${table_name1} WHERE timestamp=${date};"
+	echo "Sorry, this search hasn't been developed yet."
 elif [[ "${search_option}" = "Q" || "${search_option}" = "q" ]] ; then
 	exit 1
 else echo "Not a valid input"
