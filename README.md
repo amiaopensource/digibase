@@ -36,7 +36,7 @@ If you want a user who can connect from any host (for testing purposes only, thi
 If you need to modify a username of change a host address use this query: `RENAME USER 'username'@'host_address' TO 'new_username'@'new_host_address';`.
 
 ##Giving Permissions to the Database and Final Test
-Finally, you will need to give the new user privileges to modify the database you are using. Run the following query: `GRANT ALL PRIVILEGES ON name_of_database.* to username@host_address;`. Now run `FLUSH PRIVILEGES;` again to refresh. 
+Finally, you will need to give the new user privileges to modify the database you are using. Run the following query: `GRANT ALL PRIVILEGES ON name_of_database.* to 'username'@'host_address';`. Now run `FLUSH PRIVILEGES;` again to refresh. 
 
 To check to make sure the new user has been given the permissions on the database run `SHOW GRANTS FOR 'username'@'host_address';`. 
 
