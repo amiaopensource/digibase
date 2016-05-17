@@ -58,8 +58,11 @@ Digibase mostly works within vrecord. Run `vrecord -e` and in the GUI select "ye
 
 When digibase runs for the first time, you will be prompted for information like the host name where your SQL server is running, your username, your password, and the name of your database. This information will be saved to a configuration file (digibase.conf) in your home folder. 
 
-##Complete_qc Script
+##Finish_qc Script
 Run this script when you have completed QC of a file. The script will prompt you for an item ID and then ask you whether the item passed QC.
+
+##Check_db Script
+Use this script to search the database for various records, based on item ID or other search terms.
 
 # Status of digibase 
 Digibase is currently being tested and is not production-ready. We'll create a public release when the scripts are ready for prime time. 
