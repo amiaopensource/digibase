@@ -29,7 +29,7 @@ If you want to check to make sure sure the database was created, run this query:
 ##Creating a New User
 Now you need to create another user who is not "root" and who is allowed connect to the server from a remote computer. This should be the computer that runs vrecord to digitize tapes. Security best practice dictates that when creating this user you specificy the host address that they will connect from. You will need to find the IP addresses of both the computer running the MySQL server as well as the remote computer. First, connect to the MySQL server as "root." Now run this query: `CREATE USER 'username'@'host_address' IDENTIFIED BY 'password';`. This will create a user that can connect from a specified address. 
 
-Now run `FLUSH PRIVILEGES;`. This will refresh the user tables. To check that your user has been created you can run this query: `SELECT User, Host, Password FROM mysql.user;`. The user that you created should appear in the list.   
+Now run `FLUSH PRIVILEGES;`. This will refresh the user tables. To check that your user has been created you can run this query: `SELECT * FROM mysql.user;`. This will show the list of all users. The user that you created should appear in the list.   
 
 If you want a user who can connect from any host (for testing purposes only, this isn't secure) you can run this query: `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`. 
 
