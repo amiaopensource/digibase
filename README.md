@@ -40,8 +40,8 @@ To check to make sure the new user has been given the permissions on the databas
 Now for the real test. Go to your remote computer and try to login as your new user by running `mysql -h [host address of MySQL server] -u [username] -p[password]`. Now run this query: `USE name_of_database;`. If you see the message `Database changed`, you're good to go. Your new user can now modify the database. Your initial setup of digibase should now be complete!
 
 #Troubleshooting Installation
-##Checking IPs and Ports
-You can check to see if the computer running the MySQL server is connected by pinging. You can also check to see if the server is listening on port 3306, which is used for MySQL. Type `telnet [host address] 3306`. If the connection works you should see some garbled nonsense like this: 
+##My Computer Can't Connect to the MySQL Server
+Check to make sure your host address is correct. Next try connecting to the computer running the MySQL server by pinging. Run `ping [host_address]`. Check to make sure there are no errors. You can stop pinging by typing control + c. If pinging fails, check your network settings. If pinging succeeds, check to see if the server is listening on port 3306, which is used for MySQL. Type `telnet [host address] 3306`. If the connection works you should see some garbled nonsense like this: 
 ```
 Escape character is '^]'.
 J
