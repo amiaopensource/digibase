@@ -19,7 +19,7 @@ Now you need to create another user that is not "root" who can connect to the se
 
 Now run `FLUSH PRIVILEGES;`. This will refresh the user tables. To check that your user has been created you can run this query: `SELECT User, Host, Password FROM mysql.user;`. The user you created should appear in the list.   
 
-If you want a user who can connect from any host (for testing purposes only, this isn't secure) you can type `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`.   
+If you want a user who can connect from any host (for testing purposes only, this isn't secure) you can type `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`. If you need to modify a username of change a host address you can use this query `RENAME USER 'username'@'host_address' TO 'new_username'@'new_host_address';`.
 
 ##Giving Permissions to the Database and Final Test
 Finally, you will need to give the new user privileges to modify the database you are using. Run the following query: `GRANT ALL PRIVILEGES ON name_of_database.* to username@host_address;`. Now run `FLUSH PRIVILEGES;` again. 
