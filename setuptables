@@ -49,7 +49,7 @@ if [[ "${runtype}" = "reset" ]] ; then
     fi
 fi
 
-# Ask about username, password, database settings
+###### Ask about username, password, database settings, not sure if I need this #####
 if [ -z "${host_name}" ] ; then
     report -q -n "Enter the host location for the MySQL server: "
     read host_name
