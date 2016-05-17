@@ -8,6 +8,7 @@ Just like vrecord, currently digibase requires a computer running Mac OS X and a
 ##Installation
 Digibase and its required software can be easily installed used the Homebrew package manager for Mac OS X. Instructions for installing Homebrew are [here](http://brew.sh). 
 
+How you install MySQL all depends on how you want to use digibase. If you are using multiple computers to digitize you may want to have a separate computer run as a database server. In which case, install MySQL on your server by running `brew install mysql`. 
 Digibase is currently listed a dependency of vrecord. Even if you already have an installation of vrecord you should run `brew update` in the Terminal to get the latest installation formulae. Now run either `brew install vrecord` or `brew upgrade vrecord`. When digibase installs it should also install MySQL.  
 
 In order to use digibase, you will need to setup a MySQL server.  Run `mysql.server start`. This will start an instance of the MySQL server. Make sure starting the server is successful. Now run `mysql_secure_installation` to secure your installation. Follow the prompts. 
@@ -19,6 +20,8 @@ When running the secure installation you should have created a user of the MySQL
 ```
 $ mysql -h [name of host] -u [username, which should be "root"] -p[password, do not put a space between the "-p" and your password]
 ```
+The name of your host is "localhost" if you are connecting the local computer. 
+
 Now you need create a database that you intend to use to store information about tape digitzations. Ideal database names are all lower case and use underscores for spaces (for example, "tape_digitizations"). When signed into the server run the following query `CREATE DATABASE [name of database];`. Make sure you save the name of this database for future reference. 
 
 If you want to check to make sure sure the database was created, run this query: `SHOW DATABASES;`. You should see the name of your new database in the list. You will not need to create tables within the database. Digibase/vrecord will automatically create the appropriate tables when you run it for the first time.  
