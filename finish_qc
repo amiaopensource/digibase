@@ -1,34 +1,42 @@
-#!/bin/bash
+#!/bin/bash -x
 
 #get digibase_functions
 SCRIPTDIR=$(dirname "${0}")
 . "${SCRIPTDIR}/digibase_functions" || { echo "Missing '${SCRIPTDIR}/digibase_functions'. Exiting." ; exit 1 ;};
 
-#Need to prompt user for item ID
-echo "Type an item ID for an item you QCed and press enter"
+_setup_config_file
+
+while true;  do 
+#prompt user for item ID
+report -q -n "Type the item ID for the item you QCed and press enter: "
 read selected_item
 
 #Now check to see if item exists
-
+#Will need to figure out what to do with multiple entries that have the same item ID
+item_test=$(mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name3} WHERE item_id=${item_id_choice};")
+if [[ "${item_test}" = *"error"* ]] then ; 
+    report "Item doesn't exist"
+    #Loop back to asking for another item ID
+else 
+    report "Item exists."
 #Now ask if it passed, and write to the database
-report -q -n "Did the video file for ${id} pass QC? (Y or N) "
-read qc_answer
-
-if [[ "${qc_answer}" = "y" ]] || [[ "${qc_answer}" = "Y" ]]; then
-    mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "INSERT INTO ${table_name3} (qc_status), VALUES(passed qc)" 
-    echo "QC status for ${selected_item}  changed to 'passed QC'."
+    report -q -n "Did the video file for ${id} pass QC? (Y or N) "
+    read qc_answer
+        if [[ "${qc_answer}" = "y" ]] || [[ "${qc_answer}" = "Y" ]] ; then
+            mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "UPDATE ${table_name3} SET qc_status='passed qc' WHERE item_id=${id};"
+            echo "QC status for ${selected_item}  changed to 'passed QC'."
+        fi
+        if [[ "${qc_answer}" = "n" ]] || [[ "${qc_answer}" = "N" ]] ; then
+            mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "UPDATE ${table_name3} SET qc_status='failed qc' WHERE item_id=${id};"
+            echo "QC status changed to ${selected_item} 'failed QC'."
+        fi
+        #Ask if they want to modify another file
+        report "Do you want to modify another file? (Y or N) ? "
+        read run_again
+        if [[ "${run_again}" = "n" || "${run_again}" = "N"]] ; then
+        break
+        exit 1
+        fi
 fi
-
-if [[ "${qc_answer}" = "n" ]] || [[ "${qc_answer}" = "N" ]]; then
-    mysql -h ${host_name} -u ${user_name} -p${password} << EOF 
-USE ${database};
-INSERT INTO ${table_name3} (qc_status), VALUES(failed qc)
-echo "QC status changed to ${selected_item} 'failed QC'."
-fi
-
-#Ask if they want to modify another file
-
+done
 #Loop back to beginning if they want to modify another file, or quit if they are done
-
-UPDATE ${table_name3} SET digitization_status='digitized with errors' WHERE item_id=${id};
-
