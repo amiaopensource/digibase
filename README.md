@@ -3,7 +3,9 @@ Digibase uses an existing installation of MySQL server to create a database whic
 
 # Required Software, Installation, and Setup
 ##Installation
-In order to use digibase, you will need to install and setup a MySQL server. This can be accomplished on Mac OS X using the package manager Homebrew. Instructions for installing Homebrew are [here](http://brew.sh). To install MySQL using Homebrew open up a Terminal window and run `brew install mysql`.  Now run `mysql.server start` This will start an instance of the MySQL server. Make sure starting the server is successful. Now run `mysql_secure_installation` to secure your installation. Follow the prompts. Once MySQL has successfully installed and been secured, run `mysql.server restart`.
+In order to use digibase, you will need to install and setup a MySQL server. This can be accomplished on Mac OS X using the package manager Homebrew. Instructions for installing Homebrew are [here](http://brew.sh). To install MySQL using Homebrew open up a Terminal window and run `brew install mysql`.  Now run `mysql.server start` This will start an instance of the MySQL server. Make sure starting the server is successful. Now run `mysql_secure_installation` to secure your installation. Follow the prompts. 
+
+Once MySQL has successfully installed and been secured, run `mysql.server restart`. Make sure the restart is successful.
 
 ##Setting Up MySQL and Creating your Database
 When running the secure installation you should have created a user of the MySQL server called "root". If you are not already signed in to the MySQL server you can sign in using the following command:
@@ -19,7 +21,9 @@ Now you need to create another user that is not "root" who can connect to the se
 
 Now run `FLUSH PRIVILEGES;`. This will refresh the user tables. To check that your user has been created you can run this query: `SELECT User, Host, Password FROM mysql.user;`. The user you created should appear in the list.   
 
-If you want a user who can connect from any host (for testing purposes only, this isn't secure) you can type `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`. If you need to modify a username of change a host address you can use this query `RENAME USER 'username'@'host_address' TO 'new_username'@'new_host_address';`.
+If you want a user who can connect from any host (for testing purposes only, this isn't secure) you can type `CREATE USER 'username'@'%' IDENTIFIED BY 'password';`. 
+
+If you need to modify a username of change a host address you can use this query `RENAME USER 'username'@'host_address' TO 'new_username'@'new_host_address';`.
 
 ##Giving Permissions to the Database and Final Test
 Finally, you will need to give the new user privileges to modify the database you are using. Run the following query: `GRANT ALL PRIVILEGES ON name_of_database.* to username@host_address;`. Now run `FLUSH PRIVILEGES;` again. 
@@ -39,10 +43,10 @@ J
 ```
 Now you now the server is listening on port 3306. Otherwise you may get a `connection refused` message which means that the port is closed for some reason. You will need to open it to get MySQL to work. 
 
-# How digibase works
-When it starts up for the first time, digibase will prompt you for information like the host name where your SQL server is running, your username, your password, and the name of your database. This information will be saved to a configuration file (digibase.conf) in your home folder. 
+# How to Use Digibase
+Digibase mostly works with vrecord. You will need to say "yes" to "Digibase integration" within vrecord.
 
-Digibase mostly works with vrecord. You will need to say yes to "Digibase integration" within vrecord. 
+When it starts up for the first time, you will be prompted for information like the host name where your SQL server is running, your username, your password, and the name of your database. This information will be saved to a configuration file (digibase.conf) in your home folder. 
 
 # Status of digibase 
 Digibase is currently being tested and is not production-ready. We'll create a public release when the scripts are ready for prime time. 
