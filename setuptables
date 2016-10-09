@@ -69,15 +69,17 @@ if [ -z "${database}" ] ; then
 fi
 
 # write to configuration file
-        echo "#digibase config file" > "${digibase_config_file}"
-        echo "host_name=\"${host_name}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
-        echo "user_name=\"${user_name}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
-        echo "password=\"${password}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
-        echo "database=\"${database}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
+{
+    echo "#digibase config file"
+    echo "host_name=\"${host_name}\""
+    echo
+    echo "user_name=\"${user_name}\""
+    echo
+    echo "password=\"${password}\""
+    echo
+    echo "database=\"${database}\""
+    echo
+} > "${digibase_config_file}"
         
 # give user a summary of what they've chosen
 report -d "Summary: host: ${host_name}, user name: ${user_name}, password: ${password}, database: ${database}"
