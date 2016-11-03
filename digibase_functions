@@ -35,15 +35,17 @@ if [ -z "${database}" ] ; then
 fi
 
 # write to configuration file
-        echo "#digibase config file" > "${digibase_config_file}"
-        echo "host_name=\"${host_name}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
-        echo "user_name=\"${user_name}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
-        echo "password=\"${password}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
-        echo "database=\"${database}\"" >> "${digibase_config_file}"
-        echo  >> "${digibase_config_file}"
+    {
+        echo "#digibase config file"
+        echo "host_name=\"${host_name}\""
+        echo
+        echo "user_name=\"${user_name}\""
+        echo
+        echo "password=\"${password}\""
+        echo
+        echo "database=\"${database}\""
+        echo
+     } > "${digibase_config_file}"
         
 # give user a summary of what they've chosen
 report -d "Summary: host: ${host_name}, user name: ${user_name}, password: ${password}, database: ${database}"
@@ -85,13 +87,13 @@ _connect_db(){
 
 #Check to see if MySQL server connection is working
 _test_sql(){
-db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} 2>&1)
-if [[ "${db_errors}" = *"1045"* || *"2005"* ]] ; then
-echo "Error connecting with MySQL server. Sorry."
-exit
-else
-echo "Connection to MySQL server seems to be ok."
-fi
+    db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} 2>&1)
+    if [[ "${db_errors}" = *"1045"* || *"2005"* ]] ; then
+        echo "Error connecting with MySQL server. Sorry."
+        exit
+    else
+        echo "Connection to MySQL server seems to be ok."
+    fi
 }
 
 #Check to see if tables have already been created, if not, create them
