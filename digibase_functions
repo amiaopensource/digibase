@@ -1,6 +1,6 @@
-#shared functions for digibase
+# shared functions for digibase
 
-digibase_config_file="$HOME/digibase.conf"
+digibase_config_file="${HOME}/digibase.conf"
 table_name1="actions"
 table_name2="errors"
 table_name3="objects"
@@ -8,33 +8,31 @@ table_name4="relationships"
 
 # setup config file
 _setup_config_file(){
-# read configuration file or create one
-if [[ -f "${digibase_config_file}" ]] ; then
-    . "${digibase_config_file}"
-else
-    echo -e "No configuration file. Restarting."
-    touch "${digibase_config_file}"
-fi
-# Ask about username, password, database settings
-if [ -z "${host_name}" ] ; then
-    report -q -n "Enter the host location for the MySQL server: "
-    read host_name
-fi
-if [ -z "${user_name}" ] ; then
-    report -q -n "Enter the user name for the MySQL server: "
-    read user_name
-fi
-
-if [ -z "${password}" ] ; then
-    report -q -n "Enter the password for this user on the MySQL server: "
-    read password
-fi
-if [ -z "${database}" ] ; then
-    report -q -n "Enter the of the database you want to use on MySQL server: "
-    read database
-fi
-
-# write to configuration file
+    # read configuration file or create one
+    if [[ -f "${digibase_config_file}" ]] ; then
+        . "${digibase_config_file}"
+    else
+        echo "No configuration file. Restarting."
+        touch "${digibase_config_file}"
+    fi
+    # Ask about username, password, database settings
+    if [ -z "${host_name}" ] ; then
+        report -q -n "Enter the host location for the MySQL server: "
+        read host_name
+    fi
+    if [ -z "${user_name}" ] ; then
+        report -q -n "Enter the user name for the MySQL server: "
+        read user_name
+    fi
+    if [ -z "${password}" ] ; then
+        report -q -n "Enter the password for this user on the MySQL server: "
+        read password
+    fi
+    if [ -z "${database}" ] ; then
+        report -q -n "Enter the of the database you want to use on MySQL server: "
+        read database
+    fi
+    # write to configuration file
     {
         echo "#digibase config file"
         echo "host_name=\"${host_name}\""
@@ -45,39 +43,38 @@ fi
         echo
         echo "database=\"${database}\""
         echo
-     } > "${digibase_config_file}"
-        
-# give user a summary of what they've chosen
-report -d "Summary: host: ${host_name}, user name: ${user_name}, password: ${password}, database: ${database}"
-report -q "Press enter if settings look correct"
-read
+    } > "${digibase_config_file}"
+    # give user a summary of what they've chosen
+    report -d "Summary: host: ${host_name}, user name: ${user_name}, password: ${password}, database: ${database}"
+    report -q "Press enter if settings look correct"
+    read
 }
 
 # report function might be useful to be consistent with other apps
 report(){
-        local RED="$(tput setaf 1)"   # Red      - For Warnings
-        local GREEN="$(tput setaf 2)" # Green    - For Declarations
-        local BLUE="$(tput setaf 4)"  # Blue     - For Questions
-        local NC="$(tput sgr0)"       # No Color
-        local color=""
-        local startmessage=""
-        local endmessage=""
-        local echoopt=""
-        local log_message=""
-        OPTIND=1
-        while getopts ":qdwstn" opt; do
-            case "${opt}" in
-                q) color="${BLUE}" ;; # question mode, use color blue
-                d) color="${GREEN}" ;; # declaration mode, use color green
-                w) color="${RED}" ; log_message="Y";; # warning mode, use color red
-                s) startmessage+=([$(basename "${0}")] ) ;; # prepend scriptname to the message
-                t) startmessage+=($(_get_iso8601) '- ' ) ;; # prepend timestamp to the message
-                n) echoopt="-n" ;; # to avoid line breaks after echo
-            esac
-        done
-        shift $(( ${OPTIND} - 1 ))
-        message="${1}"
-        echo $echoopt "${color}${startmessage[@]}${message}${NC}"
+    local RED="$(tput setaf 1)"   # Red      - For Warnings
+    local GREEN="$(tput setaf 2)" # Green    - For Declarations
+    local BLUE="$(tput setaf 4)"  # Blue     - For Questions
+    local NC="$(tput sgr0)"       # No Color
+    local color=""
+    local startmessage=""
+    local endmessage=""
+    local echoopt=""
+    local log_message=""
+    OPTIND=1
+    while getopts ":qdwstn" opt; do
+        case "${opt}" in
+            q) color="${BLUE}" ;; # question mode, use color blue
+            d) color="${GREEN}" ;; # declaration mode, use color green
+            w) color="${RED}" ; log_message="Y" ;; # warning mode, use color red
+            s) startmessage+=([$(basename "${0}")] ) ;; # prepend scriptname to the message
+            t) startmessage+=($(_get_iso8601) '- ' ) ;; # prepend timestamp to the message
+            n) echoopt="-n" ;; # to avoid line breaks after echo
+        esac
+    done
+    shift $(( ${OPTIND} - 1 ))
+    message="${1}"
+    echo ${echoopt} "${color}${startmessage[@]}${message}${NC}"
 }
 
 # define how to connect to the database
@@ -98,18 +95,17 @@ _test_sql(){
 
 #Check to see if tables have already been created, if not, create them
 _create_tables(){
-db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "
-DESCRIBE ${table_name1};" 2>&1)
-if [[ "${db_errors}" = *"1146"* ]] ; then
-echo "Tables have not been set up" 
-mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "CREATE TABLE ${table_name1} (action_type varchar(30) NOT NULL, job_id MEDIUMINT(8) NOT NULL AUTO_INCREMENT, technician varchar(128) NOT NULL,  computer_name varchar(128) NOT NULL, time_started TIMESTAMP DEFAULT CURRENT_TIMESTAMP, time_ended DATETIME DEFAULT NULL, item_id VARCHAR(128), PRIMARY KEY (job_id));
+    db_errors=$(mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "DESCRIBE ${table_name1};" 2>&1)
+    if [[ "${db_errors}" = *"1146"* ]] ; then
+        echo "Tables have not been set up" 
+        mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "CREATE TABLE ${table_name1} (action_type varchar(30) NOT NULL, job_id MEDIUMINT(8) NOT NULL AUTO_INCREMENT, technician varchar(128) NOT NULL,  computer_name varchar(128) NOT NULL, time_started TIMESTAMP DEFAULT CURRENT_TIMESTAMP, time_ended DATETIME DEFAULT NULL, item_id VARCHAR(128), PRIMARY KEY (job_id));
 CREATE TABLE ${table_name2} (job_id MEDIUMINT(8) NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, error_text VARCHAR(8000), PRIMARY KEY (job_id));
 CREATE TABLE ${table_name3} (digitization_status VARCHAR(50) NOT NULL, item_id VARCHAR(128) NOT NULL, qc_status VARCHAR(50) NULL, object_type VARCHAR(50) NOT NULL, file_path VARCHAR(256) NULL, media_id VARCHAR(20) NULL, title VARCHAR(256) NULL, series VARCHAR(256), PRIMARY KEY (item_id));
 CREATE TABLE ${table_name4} (item_id VARCHAR(128) NOT NULL, relationship_type VARCHAR(128) NOT NULL, PRIMARY KEY (item_id));"
-    echo "Table set up complete!"
-elif [[ "${db_errors}" = *"1045"* || "${db_errors}" = *"2005"* ]] ; then
-    echo "You've got database connection problems. Sorry :'-( "
-else 
-    echo "Tables are already set up! B-)"
-fi 
+        echo "Table set up complete!"
+    elif [[ "${db_errors}" = *"1045"* || "${db_errors}" = *"2005"* ]] ; then
+        echo "You've got database connection problems. Sorry :'-( "
+    else 
+        echo "Tables are already set up! B-)"
+    fi 
 }
