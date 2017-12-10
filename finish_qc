@@ -14,7 +14,7 @@ while true ; do
     # Now check to see if item exists
     # Will need to figure out what to do with multiple entries that have the same item ID
     item_test=$(mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name3} WHERE item_id=${item_id_choice};")
-    if [[ "${item_test}" = *"error"* ]] then ; 
+    if [[ "${item_test}" = *"error"* ]] ; then
         report -w "Item doesn't exist"
         # Loop back to asking for another item ID
     else 
