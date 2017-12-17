@@ -1,40 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#load digibase_fuctions script and read config file
+# load digibase_fuctions script and read config file
 SCRIPTDIR=$(dirname "${0}")
-. "${SCRIPTDIR}/digibase_functions" || { echo "Missing '${SCRIPTDIR}/digibase_functions'. Exiting." ; exit 1 ;};
+. "${SCRIPTDIR}/digibase_functions" || { echo "Missing '${SCRIPTDIR}/digibase_functions'. Exiting." ; exit 1 ; }
 
 _setup_config_file
 
-#date=$(_get_iso8601) |
-#Present user with options
-#1. Search by Item ID
-#2. Search all done by today
-#3. Search by title?
-#4. Search by series?
-#5. Search by Media ID
-while [[ ${search_option} != "q" || ${search_option} != "Q" ]] ; do
-printf "How do you want to search?\nType 1 to search by Item ID,\nType 2 to search by Media ID\nType 3 to see all digitizations done by today.\nType Q if you want to stop searching.\nThen press [enter]. "
-read search_option
+# date=$(_get_iso8601) |
+# Present user with options
+# 1. Search by Item ID
+# 2. Search all done by today
+# 3. Search by title?
+# 4. Search by series?
+# 5. Search by Media ID
+unset search_option
+while [[ ${search_option} != "q" && ${search_option} != "Q" ]] ; do
+    printf "How do you want to search?\nType 1 to search by Item ID,\nType 2 to search by Media ID\nType 3 to see all digitizations done by today.\nType Q if you want to stop searching.\nThen press [enter]. "
+    read search_option
 
-
-#Query database for info
-if [[ "${search_option}" = "1" ]] ; then
-	echo "Enter the Item ID number and press enter"
-	read item_id_choice
-	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name3} WHERE item_id=${item_id_choice};"
-		#read seach_result
-	#if [[ ${search_result} = "" ]] ; then 
-		#echo "Sorry, no records matach that search"
-	#fi
-elif [[ "${search_option}" = "3" ]] ; then
-	echo "Enter the date as DD-MM-YYYY and press enter"
-	read date_choice
-	mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name1} WHERE time_started=${date_choice};"
-elif [[ "${search_option}" = "2" ]] ; then
-	echo "Sorry, this search hasn't been developed yet."
-elif [[ "${search_option}" = "Q" || "${search_option}" = "q" ]] ; then
-	exit 1
-else echo "Not a valid input"
-fi
+    # Query database for info
+    if [[ "${search_option}" = "1" ]] ; then
+        echo "Enter the Item ID number and press enter"
+        read item_id_choice
+        mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name3} WHERE item_id=${item_id_choice};"
+        # read seach_result
+        #if [[ ${search_result} = "" ]] ; then 
+        #    echo "Sorry, no records matach that search"
+        #fi
+    elif [[ "${search_option}" = "2" ]] ; then
+        echo "Sorry, this search hasn't been developed yet."
+    elif [[ "${search_option}" = "3" ]] ; then
+        echo "Enter the date as DD-MM-YYYY and press enter"
+        read date_choice
+        mysql -h ${host_name} -u ${user_name} -p${password} -D ${database} -e "SELECT * from ${table_name1} WHERE time_started=${date_choice};"
+    else
+        echo "Not a valid input"
+    fi
 done
